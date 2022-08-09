@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Reminders</string>
+    <string name="create">createbutton</string>
+    <string name="todo">TODO</string>
+    <string name="datehint">Select Date</string>
+    <string name="timehint">Select time</string>
+    <string name="subjecthint">Enter Subject</string>
+    <string name="submit">Submit</string>
+    <string name="vip">VIP</string>
+    <string name="calendar">calendar</string>
+    <string name="clock">clock</string>
+    <string name="textview">TextView</string>
+    <string name="stop">stop</string>
+</resources>

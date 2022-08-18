@@ -1,4 +1,4 @@
-package com.example.reminders;
+package com.example.reminders.Recievers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +12,7 @@ public class AlarmReciever extends BroadcastReceiver {
             String subject = intent.getStringExtra("subject");
             intent = new Intent();
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setClassName("com.example.reminders","com.example.reminders.AlarmActivity");
+            intent.setClassName("com.example.reminders","com.example.reminders.Activities.AlarmActivity");
             intent.putExtra("subject", subject);
             context.startActivity(intent);
         }catch(Exception e){

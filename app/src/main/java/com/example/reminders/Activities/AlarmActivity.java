@@ -1,4 +1,4 @@
-package com.example.reminders;
+package com.example.reminders.Activities;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.reminders.R;
 
 import java.io.IOException;
 import java.util.Objects;

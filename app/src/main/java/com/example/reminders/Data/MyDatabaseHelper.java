@@ -86,5 +86,6 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         cv.put(date,myData.dateString);
         cv.put(vip,myData.isVIP?1:0);
         db.update( Table_name , cv ,request_code_column + " = " + myData.requestCode , null );
+        db.close();
     }
 }

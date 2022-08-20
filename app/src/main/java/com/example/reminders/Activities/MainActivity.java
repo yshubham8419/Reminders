@@ -4,20 +4,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.ListView;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.example.reminders.Adapter.MyAdapter;
 import com.example.reminders.Data.MyData;
 import com.example.reminders.Data.SyncedArray;
+import com.example.reminders.Listeners.NavigationItemSelectedListener;
 import com.example.reminders.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private SyncedArray arr;
     private MyAdapter adapter;
@@ -26,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private int selected;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    NavigationView navigationView;
+    DrawerLayout drawerLayout;
+    androidx.appcompat.widget.Toolbar toolbar;
+    ActionBarDrawerToggle drawerToggle;
 
     private void initValues(){
         selected = 0;
@@ -39,11 +49,25 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    private  void initNavigationDrawer(){
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Reminders");
+        toolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(toolbar);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose);
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+        navigationView = findViewById(R.id.navigation);
+        navigationView.setNavigationItemSelectedListener(new NavigationItemSelectedListener());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initValues();
+        initNavigationDrawer();
         listView.setAdapter(adapter);
         button.setOnClickListener(view -> onFloatingButtonClicked());
     }

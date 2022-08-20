@@ -4,10 +4,14 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.19021739130434784" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.347444089456869" />
+        <entry key="app/src/main/res/drawable/home_icon.xml" value="0.21" />
+        <entry key="app/src/main/res/layout-v23/activity_main.xml" value="0.2530949105914718" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.23661270236612703" />
         <entry key="app/src/main/res/layout/alarm_layout.xml" value="0.22552083333333334" />
         <entry key="app/src/main/res/layout/my_layout.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/navigation_drawer_header.xml" value="0.22" />
         <entry key="app/src/main/res/layout/set_reminder.xml" value="0.22" />
+        <entry key="app/src/main/res/menu/nav_items.xml" value="0.2265625" />
       </map>
     </option>
   </component>

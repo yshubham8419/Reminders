@@ -11,4 +11,13 @@
     <string name="clock">clock</string>
     <string name="textview">TextView</string>
     <string name="stop">stop</string>
+    <string name="Navigation_Drawer">navigation_drawer</string>
+    <string name="drawerOpen">drawerOpen</string>
+    <string name="drawerClose">drawerClose</string>
+    <string name="search">Search</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
+    <string name="account">Account</string>
+    <string name="share">Share</string>
+    <string name="rate">Rate</string>
 </resources>

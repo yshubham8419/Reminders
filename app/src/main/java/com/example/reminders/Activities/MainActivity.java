@@ -1,5 +1,6 @@
 package com.example.reminders.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,17 +9,20 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.reminders.Activities.ui.login.GoogleLoginActivity;
 import com.example.reminders.Adapter.MyAdapter;
 import com.example.reminders.Data.MyData;
 import com.example.reminders.Data.SyncedArray;
-import com.example.reminders.Listeners.NavigationItemSelectedListener;
 import com.example.reminders.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -30,12 +34,14 @@ public class MainActivity extends AppCompatActivity{
     private ListView listView;
     private FloatingActionButton button;
     private int selected;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
-    NavigationView navigationView;
-    DrawerLayout drawerLayout;
-    androidx.appcompat.widget.Toolbar toolbar;
-    ActionBarDrawerToggle drawerToggle;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+    private androidx.appcompat.widget.Toolbar toolbar;
+    private ActionBarDrawerToggle drawerToggle;
+    private int drawerSelectedId;
+    private boolean drawerSelectedIdChanged;
 
     private void initValues(){
         selected = 0;
@@ -47,6 +53,8 @@ public class MainActivity extends AppCompatActivity{
         editor =  sharedPreferences.edit();
         editor.putBoolean("updated",false);
         editor.apply();
+        drawerSelectedId = R.id.nav_home;
+        drawerSelectedIdChanged = false;
     }
 
     private  void initNavigationDrawer(){
@@ -55,13 +63,38 @@ public class MainActivity extends AppCompatActivity{
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose);
+        drawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose){
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                if(drawerSelectedIdChanged) {
+                    startSelectedNavActivity();
+                }
+                super.onDrawerClosed(drawerView);
+            }
+        };
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
         navigationView = findViewById(R.id.navigation);
-        navigationView.setNavigationItemSelectedListener(new NavigationItemSelectedListener());
+        navigationView.setNavigationItemSelectedListener(item -> {
+            Toast.makeText(this, "called", Toast.LENGTH_SHORT).show();
+            drawerSelectedIdChanged = drawerSelectedId != item.getItemId();
+            drawerSelectedId = item.getItemId();
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        });
+        navigationView.setCheckedItem(R.id.nav_home);
     }
+    @SuppressLint("NonConstantResourceId")
+    void startSelectedNavActivity(){
+        switch(drawerSelectedId){
+            case R.id.nav_account :
+                Intent intent = new Intent(getBaseContext(), GoogleLoginActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.pop_in,R.anim.fade_out);
+                break;
+        }
 
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,6 +189,8 @@ public class MainActivity extends AppCompatActivity{
             editor.putBoolean("updated",false);
             editor.apply();
         }
+        navigationView.setCheckedItem(R.id.nav_home);
+        drawerSelectedId = R.id.nav_home;
         super.onRestart();
     }
 

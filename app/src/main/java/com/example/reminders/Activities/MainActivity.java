@@ -19,7 +19,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.reminders.Activities.ui.login.GoogleLoginActivity;
 import com.example.reminders.Adapter.MyAdapter;
 import com.example.reminders.Data.MyData;
 import com.example.reminders.Data.SyncedArray;
@@ -88,7 +87,8 @@ public class MainActivity extends AppCompatActivity{
     void startSelectedNavActivity(){
         switch(drawerSelectedId){
             case R.id.nav_account :
-                Intent intent = new Intent(getBaseContext(), GoogleLoginActivity.class);
+                Intent intent = new Intent(getBaseContext(),
+                        GoogleLoginActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.pop_in,R.anim.fade_out);
                 break;

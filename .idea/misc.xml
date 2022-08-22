@@ -7,6 +7,8 @@
         <entry key="app/src/main/res/drawable/home_icon.xml" value="0.21" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.1105" />
         <entry key="app/src/main/res/layout-v23/activity_main.xml" value="0.2530949105914718" />
+        <entry key="app/src/main/res/layout-w1240dp/activity_google_login.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_google_login.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.23661270236612703" />
         <entry key="app/src/main/res/layout/alarm_layout.xml" value="0.22552083333333334" />
         <entry key="app/src/main/res/layout/my_layout.xml" value="0.33" />

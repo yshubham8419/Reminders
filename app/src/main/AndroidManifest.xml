@@ -22,6 +22,9 @@
             android:name=".Activities.GoogleLoginActivity"
             android:exported="false" />
         <activity
+            android:name=".Activities.AccountPage"
+            android:exported="false" />
+        <activity
             android:name=".Activities.MainActivity"
             android:exported="true">
             <intent-filter>

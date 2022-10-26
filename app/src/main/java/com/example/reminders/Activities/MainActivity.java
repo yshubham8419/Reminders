@@ -5,12 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +33,15 @@ import com.example.reminders.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -47,7 +60,7 @@ public class MainActivity extends AppCompatActivity{
     private boolean drawerSelectedIdChanged;
     private GoogleSignInAccount account;
     private TextView nameTv;
-    private ImageView photo;
+    private ShapeableImageView photo;
     private void initValues(){
         selected = 0;
         listView = findViewById(R.id.list);
@@ -94,7 +107,6 @@ public class MainActivity extends AppCompatActivity{
         photo=header.findViewById(R.id.nav_photo);
         if(account!=null) {
             nameTv.setText(account.getDisplayName());
-            photo.setImageURI(account.getPhotoUrl());
         }
         else
             nameTv.setText("Please Sign In");
@@ -103,10 +115,8 @@ public class MainActivity extends AppCompatActivity{
     void startSelectedNavActivity(){
         switch(drawerSelectedId){
             case R.id.nav_account :
-                Intent intent = new Intent(getBaseContext(),
-                        GoogleLoginActivity.class);
+                Intent intent = new Intent(getBaseContext(), account==null?GoogleLoginActivity.class:AccountPage.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.pop_in,R.anim.fade_out);
                 break;
         }
 
@@ -239,5 +249,6 @@ public class MainActivity extends AppCompatActivity{
             button.setForeground(drawable);
         }
     }
+
 }
 

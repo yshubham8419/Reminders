@@ -10,7 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -23,6 +25,8 @@ import com.example.reminders.Adapter.MyAdapter;
 import com.example.reminders.Data.MyData;
 import com.example.reminders.Data.SyncedArray;
 import com.example.reminders.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -41,7 +45,9 @@ public class MainActivity extends AppCompatActivity{
     private ActionBarDrawerToggle drawerToggle;
     private int drawerSelectedId;
     private boolean drawerSelectedIdChanged;
-
+    private GoogleSignInAccount account;
+    private TextView nameTv;
+    private ImageView photo;
     private void initValues(){
         selected = 0;
         listView = findViewById(R.id.list);
@@ -54,6 +60,7 @@ public class MainActivity extends AppCompatActivity{
         editor.apply();
         drawerSelectedId = R.id.nav_home;
         drawerSelectedIdChanged = false;
+        account = GoogleSignIn.getLastSignedInAccount(this);
     }
 
     private  void initNavigationDrawer(){
@@ -82,6 +89,15 @@ public class MainActivity extends AppCompatActivity{
             return true;
         });
         navigationView.setCheckedItem(R.id.nav_home);
+        View header = navigationView.getHeaderView(0);
+        nameTv=header.findViewById(R.id.nav_name);
+        photo=header.findViewById(R.id.nav_photo);
+        if(account!=null) {
+            nameTv.setText(account.getDisplayName());
+            photo.setImageURI(account.getPhotoUrl());
+        }
+        else
+            nameTv.setText("Please Sign In");
     }
     @SuppressLint("NonConstantResourceId")
     void startSelectedNavActivity(){

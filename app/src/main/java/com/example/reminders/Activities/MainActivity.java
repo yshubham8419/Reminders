@@ -1,7 +1,6 @@
 package com.example.reminders.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,12 +9,17 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
@@ -33,11 +37,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 
+import java.io.IOException;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity{
@@ -270,10 +278,10 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "no permissions", Toast.LENGTH_SHORT).show();
             return;
         }
-
-
+        uploadFile();
     }
-    void uploadFile(){
+
+    private void  uploadFile(){
         GoogleAccountCredential credential=
                 GoogleAccountCredential
                         .usingOAuth2(this, Collections.singleton(DriveScopes.DRIVE_FILE));
@@ -281,9 +289,30 @@ public class MainActivity extends AppCompatActivity{
         Drive drive = new Drive.Builder(new NetHttpTransport(),new GsonFactory(),credential)
                 .setApplicationName("Reminders")
                 .build();
-
-
+        File fileMetadata = new File();
+        fileMetadata.setName("photo.jpeg");
+        // File's content.
+        java.io.File filePath = new java.io.File(Environment.getExternalStorageDirectory()+"/image.jpeg");
+        // Specify media type and file-path for file.
+        FileContent mediaContent = new FileContent("image/jpeg", filePath);
+        Thread thread= new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    File file = drive.files().create(fileMetadata, mediaContent)
+                            .setFields("id")
+                            .execute();
+                }catch(UserRecoverableAuthIOException e){
+                            startActivity(e.getIntent());
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
     }
 
 }
+
+
 

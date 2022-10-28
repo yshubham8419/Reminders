@@ -4,6 +4,8 @@ package com.example.reminders.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -34,6 +36,10 @@ public class AccountPage extends AppCompatActivity {
                 client.signOut().addOnCompleteListener( new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        SharedPreferences.Editor editor =
+                                getSharedPreferences("MySharedPreference", Context.MODE_PRIVATE).edit();
+                        editor.putBoolean("account_updated",true);
+                        editor.apply();
                         finish();
                     }
                 });

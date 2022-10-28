@@ -1,21 +1,17 @@
 package com.example.reminders.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,16 +28,17 @@ import com.example.reminders.Data.SyncedArray;
 import com.example.reminders.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -61,6 +58,7 @@ public class MainActivity extends AppCompatActivity{
     private GoogleSignInAccount account;
     private TextView nameTv;
     private ShapeableImageView photo;
+    private ImageButton sync;
     private void initValues(){
         selected = 0;
         listView = findViewById(R.id.list);
@@ -74,6 +72,8 @@ public class MainActivity extends AppCompatActivity{
         drawerSelectedId = R.id.nav_home;
         drawerSelectedIdChanged = false;
         account = GoogleSignIn.getLastSignedInAccount(this);
+        sync=findViewById(R.id.sync_button);
+        sync.setOnClickListener(view -> onSyncClicked());
     }
 
     private  void initNavigationDrawer(){
@@ -102,14 +102,19 @@ public class MainActivity extends AppCompatActivity{
             return true;
         });
         navigationView.setCheckedItem(R.id.nav_home);
+        accountUpdate();
+    }
+    void accountUpdate(){
+        account = GoogleSignIn.getLastSignedInAccount(this);
         View header = navigationView.getHeaderView(0);
         nameTv=header.findViewById(R.id.nav_name);
         photo=header.findViewById(R.id.nav_photo);
         if(account!=null) {
             nameTv.setText(account.getDisplayName());
         }
-        else
-            nameTv.setText("Please Sign In");
+        else {
+            nameTv.setText(R.string.signinrequest);
+        }
     }
     @SuppressLint("NonConstantResourceId")
     void startSelectedNavActivity(){
@@ -215,6 +220,11 @@ public class MainActivity extends AppCompatActivity{
             editor.putBoolean("updated",false);
             editor.apply();
         }
+        if(sharedPreferences.getBoolean("account_updated",false)){
+            accountUpdate();
+            editor.putBoolean("account_updated",false);
+            editor.apply();
+        }
         navigationView.setCheckedItem(R.id.nav_home);
         drawerSelectedId = R.id.nav_home;
         super.onRestart();
@@ -248,6 +258,31 @@ public class MainActivity extends AppCompatActivity{
             Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.delete_icon, null);
             button.setForeground(drawable);
         }
+    }
+    public void onSyncClicked(){
+        if(account==null){
+            Intent intent = new Intent(getBaseContext(), GoogleLoginActivity.class);
+            startActivity(intent);
+            return;
+        }
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(MainActivity.this),new Scope(DriveScopes.DRIVE_APPDATA))){
+            GoogleSignIn.requestPermissions(MainActivity.this, 0, GoogleSignIn.getLastSignedInAccount(MainActivity.this), new Scope(DriveScopes.DRIVE_APPDATA));
+            Toast.makeText(this, "no permissions", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+    }
+    void uploadFile(){
+        GoogleAccountCredential credential=
+                GoogleAccountCredential
+                        .usingOAuth2(this, Collections.singleton(DriveScopes.DRIVE_FILE));
+        credential.setSelectedAccount(account.getAccount());
+        Drive drive = new Drive.Builder(new NetHttpTransport(),new GsonFactory(),credential)
+                .setApplicationName("Reminders")
+                .build();
+
+
     }
 
 }

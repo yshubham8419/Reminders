@@ -21,7 +21,16 @@
             android:theme="?attr/actionBarTheme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+            <ImageButton
+                android:layout_width="48dp"
+                android:id="@+id/sync_button"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_sync_24"
+                android:background="@color/purple_700"
+                android:layout_gravity="right"
+                android:contentDescription="Sync" />
+        </androidx.appcompat.widget.Toolbar>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton3"

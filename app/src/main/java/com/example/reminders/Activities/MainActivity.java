@@ -9,17 +9,12 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
@@ -29,24 +24,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.reminders.Adapter.MyAdapter;
 import com.example.reminders.Data.MyData;
 import com.example.reminders.Data.SyncedArray;
+import com.example.reminders.Drive.Syncer;
 import com.example.reminders.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.http.FileContent;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
-
-import java.io.IOException;
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -66,7 +50,9 @@ public class MainActivity extends AppCompatActivity{
     private GoogleSignInAccount account;
     private TextView nameTv;
     private ShapeableImageView photo;
-    private ImageButton sync;
+    private ImageButton upload_button;
+    private ImageButton restore_button;
+
     private void initValues(){
         selected = 0;
         listView = findViewById(R.id.list);
@@ -80,8 +66,10 @@ public class MainActivity extends AppCompatActivity{
         drawerSelectedId = R.id.nav_home;
         drawerSelectedIdChanged = false;
         account = GoogleSignIn.getLastSignedInAccount(this);
-        sync=findViewById(R.id.sync_button);
-        sync.setOnClickListener(view -> onSyncClicked());
+        upload_button=findViewById(R.id.upload_button);
+        upload_button.setOnClickListener(view -> onSyncClicked("upload"));
+        restore_button = findViewById(R.id.restore_button);
+        restore_button.setOnClickListener(view -> onSyncClicked("restore"));
     }
 
     private  void initNavigationDrawer(){
@@ -112,6 +100,7 @@ public class MainActivity extends AppCompatActivity{
         navigationView.setCheckedItem(R.id.nav_home);
         accountUpdate();
     }
+
     void accountUpdate(){
         account = GoogleSignIn.getLastSignedInAccount(this);
         View header = navigationView.getHeaderView(0);
@@ -124,6 +113,7 @@ public class MainActivity extends AppCompatActivity{
             nameTv.setText(R.string.signinrequest);
         }
     }
+
     @SuppressLint("NonConstantResourceId")
     void startSelectedNavActivity(){
         switch(drawerSelectedId){
@@ -134,6 +124,7 @@ public class MainActivity extends AppCompatActivity{
         }
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -253,63 +244,28 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void notifySelectionStopped() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Resources resources = getResources();
-            Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.abcd, null);
-            button.setForeground(drawable);
-        }
+        Resources resources = getResources();
+        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.abcd, null);
+        button.setForeground(drawable);
     }
 
     public void notifySelectionStarted() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Resources resources = getResources();
-            Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.delete_icon, null);
-            button.setForeground(drawable);
-        }
+        Resources resources = getResources();
+        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.delete_icon, null);
+        button.setForeground(drawable);
     }
-    public void onSyncClicked(){
+
+    public void onSyncClicked(String s){
         if(account==null){
             Intent intent = new Intent(getBaseContext(), GoogleLoginActivity.class);
             startActivity(intent);
             return;
         }
-        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(MainActivity.this),new Scope(DriveScopes.DRIVE_APPDATA))){
-            GoogleSignIn.requestPermissions(MainActivity.this, 0, GoogleSignIn.getLastSignedInAccount(MainActivity.this), new Scope(DriveScopes.DRIVE_APPDATA));
-            Toast.makeText(this, "no permissions", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        uploadFile();
-    }
-
-    private void  uploadFile(){
-        GoogleAccountCredential credential=
-                GoogleAccountCredential
-                        .usingOAuth2(this, Collections.singleton(DriveScopes.DRIVE_FILE));
-        credential.setSelectedAccount(account.getAccount());
-        Drive drive = new Drive.Builder(new NetHttpTransport(),new GsonFactory(),credential)
-                .setApplicationName("Reminders")
-                .build();
-        File fileMetadata = new File();
-        fileMetadata.setName("photo.jpeg");
-        // File's content.
-        java.io.File filePath = new java.io.File(Environment.getExternalStorageDirectory()+"/image.jpeg");
-        // Specify media type and file-path for file.
-        FileContent mediaContent = new FileContent("image/jpeg", filePath);
-        Thread thread= new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File file = drive.files().create(fileMetadata, mediaContent)
-                            .setFields("id")
-                            .execute();
-                }catch(UserRecoverableAuthIOException e){
-                            startActivity(e.getIntent());
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
+        Syncer syncer =new Syncer(this);
+        if(s=="upload")
+            syncer.uploadDatabase();
+        if(s=="restore")
+            syncer.restoreDatabase(arr);
     }
 
 }

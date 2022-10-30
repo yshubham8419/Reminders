@@ -24,9 +24,17 @@
             app:layout_constraintTop_toTopOf="parent">
             <ImageButton
                 android:layout_width="48dp"
-                android:id="@+id/sync_button"
+                android:id="@+id/restore_button"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_sync_24"
+                android:src="@drawable/ic_baseline_cloud_download_24"
+                android:background="@color/purple_700"
+                android:layout_gravity="right"
+                android:contentDescription="Sync" />
+            <ImageButton
+                android:layout_width="48dp"
+                android:id="@+id/upload_button"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_cloud_upload_24"
                 android:background="@color/purple_700"
                 android:layout_gravity="right"
                 android:contentDescription="Sync" />
